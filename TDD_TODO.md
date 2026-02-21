@@ -87,16 +87,16 @@ TDD v1.1 (wedge-scope, finansal-grade) referans alınarak sadece **backend** iç
 ## Faz 4 — Auth & RBAC
 
 ### 4.1 Auth
-- [ ] JWT auth middleware
-- [ ] bcrypt password hash
-- [ ] JWT claims: user_id, branch_id, role
-- [ ] Login / Logout → AuditLog (ip_address, user_agent hash)
+- [x] JWT auth middleware
+- [x] bcrypt password hash
+- [x] JWT claims: user_id, branch_id, role
+- [x] Login / Logout → AuditLog (ip_address, user_agent hash)
 
 ### 4.2 RBAC
-- [ ] owner: tüm işlemler, cross-branch okuma
-- [ ] manager: approval gerekli işlemler, backdated, adjustment
-- [ ] cashier: sadece bugün transaction, satış/alış
-- [ ] auditor: salt okuma, AuditLog erişimi
+- [x] owner: tüm işlemler, cross-branch okuma
+- [x] manager: approval gerekli işlemler, backdated, adjustment
+- [x] cashier: sadece bugün transaction, satış/alış
+- [x] auditor: salt okuma, AuditLog erişimi
 
 ---
 
