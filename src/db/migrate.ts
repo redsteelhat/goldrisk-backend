@@ -1,8 +1,9 @@
 /**
  * GoldRisk AI - Database Migration Runner
- * Usage: DATABASE_URL=postgres://... npm run db:migrate
+ * .env dosyasından DATABASE_URL okur.
  */
 
+import 'dotenv/config';
 import pg from 'pg';
 import { readdir, readFile } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
