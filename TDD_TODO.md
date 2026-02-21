@@ -71,16 +71,16 @@ TDD v1.1 (wedge-scope, finansal-grade) referans alınarak sadece **backend** iç
 ## Faz 3 — Veritabanı Güvenliği
 
 ### 3.1 Triggers
-- [ ] `validate_transaction_total`: total_amount = quantity_g * unit_price_g + labor_amount
-- [ ] `validate_daily_price`: sell_price >= buy_price
-- [ ] `check_negative_balance`: StockLedger insert sonrası bakiye >= 0 (veya alarm)
-- [ ] `audit_golditem_status_change`: GoldItem.status değişiminde AuditLog (AFTER UPDATE trigger)
+- [x] `validate_transaction_total`: total_amount = quantity_g * unit_price_g + labor_amount
+- [x] `validate_daily_price`: sell_price >= buy_price
+- [x] `check_negative_balance`: StockLedger insert sonrası bakiye >= 0 (veya alarm)
+- [x] `audit_golditem_status_change`: GoldItem.status değişiminde AuditLog (AFTER UPDATE trigger)
 
 ### 3.2 Row-Level Security (RLS)
-- [ ] RLS enable: stock_ledger, transaction, product, gold_item, daily_price, audit_log
-- [ ] Policy: branch_id = current_setting('app.current_branch_id')::uuid
-- [ ] AuditLog: INSERT-only policy; UPDATE/DELETE yasak
-- [ ] Cross-branch: owner + HQ için exception policy
+- [x] RLS enable: stock_ledger, transaction, product, gold_item, daily_price, audit_log
+- [x] Policy: branch_id = current_setting('app.current_branch_id')::uuid
+- [x] AuditLog: INSERT-only policy; UPDATE/DELETE yasak
+- [x] Cross-branch: owner + HQ için exception policy
 
 ---
 
