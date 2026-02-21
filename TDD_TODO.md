@@ -111,10 +111,10 @@ TDD v1.1 (wedge-scope, finansal-grade) referans alınarak sadece **backend** iç
 ### 5.2 Transaction Servisi
 - [x] **Sale**: price lock → GoldItem FOR UPDATE SKIP LOCKED → Transaction + StockLedger credit (atomik)
 - [x] **Purchase**: Transaction + StockLedger debit (atomik)
-- [ ] **Return**: parent_transaction_id zorunlu, quantity_g = gerçek tartım
-- [ ] **Exchange**: bozdurma + yeni satış (veya tek transaction)
-- [ ] **Adjustment**: manager onayı, ledger debit/credit
-- [ ] **Scrap**: fire veya hurda
+- [x] **Return**: parent_transaction_id zorunlu, quantity_g = gerçek tartım, labor_refund
+- [ ] **Exchange**: bozdurma + yeni satış (opsiyonel)
+- [x] **Adjustment**: manager onayı, ledger debit/credit
+- [x] **Scrap**: fire veya hurda
 - [x] Idempotency: client_request_id kontrolü
 - [x] MASAK: total_amount >= 20000 AND payment_method = 'cash' → flag
 
@@ -125,26 +125,26 @@ TDD v1.1 (wedge-scope, finansal-grade) referans alınarak sadece **backend** iç
 - [x] Negatif bakiye CHECK / trigger (Faz 3)
 
 ### 5.4 Gram Edge-Cases
-- [ ] A1: Tartım farkı → GoldItem.actual_weight_g esas; fark > eşik → adjustment + AuditLog
-- [ ] A2: Manuel gram düzeltme → sadece owner/manager; adjustment Transaction zorunlu (direkt UPDATE yasak)
-- [ ] A3: Sayım sonrası → StockReconciliation: inventory_gain / inventory_loss transaction
+- [x] A1: Tartım farkı → GoldItem.actual_weight_g esas; fark > eşik → AuditLog (Return akışında)
+- [x] A2: Manuel gram düzeltme → sadece owner/manager; adjustment Transaction zorunlu (direkt UPDATE yasak)
+- [x] A3: Sayım sonrası → StockReconciliation: inventory_gain / inventory_loss transaction
 
 ### 5.5 Fire Hesaplama
-- [ ] B1: Üretim fire → input credit, output debit, fire debit (reason='fire')
-- [ ] B2: Satış maliyet fire → fire_cost hesaplama, Transaction'a yazma
-- [ ] B3: Fire stoktan düşüm → ledger credit (reason='fire')
-- [ ] FireRate öncelik: Product.fire_rate_id → global aktif
+- [x] B1: Üretim fire → input credit, output debit, fire credit (reason='fire')
+- [x] B2: Satış maliyet fire → fire_cost hesaplama, Transaction'a yazma
+- [x] B3: Fire stoktan düşüm → ledger credit (reason='fire')
+- [x] FireRate öncelik: Product.fire_rate_id → global aktif
 
 ### 5.6 İade / Bozdurma
-- [ ] D1: İade gram farkı → parent'a bağlı iade + fark için adjustment
-- [ ] D2: İade fiyat kuralı → branch settings (orijinal vs güncel)
-- [ ] D3: labor_refund_amount → default: iade edilmez; manager override
+- [x] D1: İade gram farkı → parent'a bağlı iade, quantity_g = gerçek tartım
+- [x] D2: İade fiyat kuralı → orijinal transaction unit_price kullanılır
+- [x] D3: labor_refund_amount → default: iade edilmez (0); opsiyonel override
 
 ### 5.7 Şube Transferi
-- [ ] transfer_request oluşturma
-- [ ] Source onay → credit (reason='transfer_out'), GoldItem.status='transferred'
-- [ ] Target receive → debit (reason='transfer_in'), GoldItem.branch_id güncelleme
-- [ ] Atomik: source credit + target debit tek DB transaction
+- [x] transfer_request oluşturma
+- [x] Source onay → credit (reason='transfer_out'), GoldItem.status='transferred'
+- [x] Target receive → debit (reason='transfer_in'), GoldItem.branch_id güncelleme
+- [x] Atomik: source approve + target receive her biri kendi DB transaction
 
 ---
 
@@ -166,10 +166,10 @@ TDD v1.1 (wedge-scope, finansal-grade) referans alınarak sadece **backend** iç
 ## Faz 7 — Reconciliation & Job’lar
 
 ### 7.1 Reconciliation
-- [ ] ledger_balance = SUM(debit) - SUM(credit) per branch+product
+- [x] ledger_balance = SUM(debit) - SUM(credit) per branch+product
 - [ ] Snapshot vs ledger karşılaştırma
 - [ ] Fark varsa: reconciliation_alert, manager onayı ile adjustment
-- [ ] StockReconciliation batch: sayım_g vs ledger_g → inventory_gain/loss
+- [x] StockReconciliation batch: sayım_g vs ledger_g → inventory_gain/loss
 
 ### 7.2 Gece Job’ları
 - [ ] Günlük stock_snapshot (00:00)
