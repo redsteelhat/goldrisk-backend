@@ -6,9 +6,13 @@
 import pool from '../lib/db.js';
 import { lockPriceForTransaction } from './daily-price.service.js';
 import { appendLedgerEntry } from './stock-ledger.service.js';
+import { getEffectiveFireRate, calculateFireCost } from './fire-rate.service.js';
+import { logWeightDiscrepancy } from './audit.service.js';
 import { gramTimesPrice, toGram, toTRY, type Gram, type TRYAmount } from '../types/decimal.js';
 import { decimalToPg } from '../lib/pg-decimal.js';
 import type { GoldType } from './daily-price.service.js';
+
+const WEIGHT_DISCREPANCY_THRESHOLD_G = 0.01;
 
 export type PaymentMethod = 'cash' | 'pos' | 'transfer' | 'gold_exchange' | 'mixed';
 
@@ -104,13 +108,19 @@ export async function createSale(
     const totalAmount = gramTimesPrice(quantityG, unitPrice);
     const totalAmountWithLabor = totalAmount.plus(laborAmount);
 
+    const fireRate = await getEffectiveFireRate(gold.product_id, goldType);
+    const fireCostStr =
+      fireRate > 0
+        ? calculateFireCost(gold.actual_weight_g, fireRate, gold.acquisition_price_g)
+        : null;
+
     const masak =
       input.payment_method === 'cash' &&
       totalAmountWithLabor.toNumber() >= MASAK_THRESHOLD;
 
     const txnResult = await client.query(
-      `INSERT INTO "transaction" (branch_id, type, gold_item_id, customer_id, quantity_g, unit_price_g, labor_amount, total_amount, daily_price_id, payment_method, client_request_id, masak_reported, notes, created_by)
-       VALUES ($1, 'sale', $2, $3, $4::numeric, $5::numeric, $6::numeric, $7::numeric, $8, $9::payment_method, $10, $11, $12, $13)
+      `INSERT INTO "transaction" (branch_id, type, gold_item_id, customer_id, quantity_g, unit_price_g, labor_amount, total_amount, daily_price_id, payment_method, client_request_id, masak_reported, fire_cost, notes, created_by)
+       VALUES ($1, 'sale', $2, $3, $4::numeric, $5::numeric, $6::numeric, $7::numeric, $8, $9::payment_method, $10, $11, $12::numeric, $13, $14)
        RETURNING id`,
       [
         input.branch_id,
@@ -124,6 +134,7 @@ export async function createSale(
         input.payment_method,
         input.client_request_id ?? null,
         masak,
+        fireCostStr,
         input.notes ?? null,
         createdBy,
       ]
@@ -323,6 +334,23 @@ export async function createReturn(
       },
       client
     );
+
+    // A1: Tartım farkı > eşik → AuditLog (Return zaten actual_weight ile kayıtlı; ek adjustment stok çift sayımı yapar)
+    const parentQty = toGram(parent.quantity_g);
+    const diff = quantityG.minus(parentQty).abs();
+    if (diff.greaterThan(WEIGHT_DISCREPANCY_THRESHOLD_G)) {
+      await logWeightDiscrepancy(
+        createdBy,
+        input.branch_id,
+        'gold_item',
+        input.gold_item_id,
+        decimalToPg(parentQty),
+        decimalToPg(quantityG),
+        String(WEIGHT_DISCREPANCY_THRESHOLD_G),
+        'return',
+        client
+      );
+    }
 
     await client.query(
       `SELECT set_config('app.current_user_id', $1, true)`,

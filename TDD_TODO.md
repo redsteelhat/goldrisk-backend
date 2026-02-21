@@ -125,15 +125,15 @@ TDD v1.1 (wedge-scope, finansal-grade) referans alınarak sadece **backend** iç
 - [x] Negatif bakiye CHECK / trigger (Faz 3)
 
 ### 5.4 Gram Edge-Cases
-- [ ] A1: Tartım farkı → GoldItem.actual_weight_g esas; fark > eşik → adjustment + AuditLog
-- [ ] A2: Manuel gram düzeltme → sadece owner/manager; adjustment Transaction zorunlu (direkt UPDATE yasak)
-- [ ] A3: Sayım sonrası → StockReconciliation: inventory_gain / inventory_loss transaction
+- [x] A1: Tartım farkı → GoldItem.actual_weight_g esas; fark > eşik → AuditLog (Return akışında)
+- [x] A2: Manuel gram düzeltme → sadece owner/manager; adjustment Transaction zorunlu (direkt UPDATE yasak)
+- [x] A3: Sayım sonrası → StockReconciliation: inventory_gain / inventory_loss transaction
 
 ### 5.5 Fire Hesaplama
-- [ ] B1: Üretim fire → input credit, output debit, fire debit (reason='fire')
-- [ ] B2: Satış maliyet fire → fire_cost hesaplama, Transaction'a yazma
-- [ ] B3: Fire stoktan düşüm → ledger credit (reason='fire')
-- [ ] FireRate öncelik: Product.fire_rate_id → global aktif
+- [x] B1: Üretim fire → input credit, output debit, fire credit (reason='fire')
+- [x] B2: Satış maliyet fire → fire_cost hesaplama, Transaction'a yazma
+- [x] B3: Fire stoktan düşüm → ledger credit (reason='fire')
+- [x] FireRate öncelik: Product.fire_rate_id → global aktif
 
 ### 5.6 İade / Bozdurma
 - [x] D1: İade gram farkı → parent'a bağlı iade, quantity_g = gerçek tartım
@@ -166,10 +166,10 @@ TDD v1.1 (wedge-scope, finansal-grade) referans alınarak sadece **backend** iç
 ## Faz 7 — Reconciliation & Job’lar
 
 ### 7.1 Reconciliation
-- [ ] ledger_balance = SUM(debit) - SUM(credit) per branch+product
+- [x] ledger_balance = SUM(debit) - SUM(credit) per branch+product
 - [ ] Snapshot vs ledger karşılaştırma
 - [ ] Fark varsa: reconciliation_alert, manager onayı ile adjustment
-- [ ] StockReconciliation batch: sayım_g vs ledger_g → inventory_gain/loss
+- [x] StockReconciliation batch: sayım_g vs ledger_g → inventory_gain/loss
 
 ### 7.2 Gece Job’ları
 - [ ] Günlük stock_snapshot (00:00)
