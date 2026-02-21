@@ -10,6 +10,7 @@ import {
   type GoldType,
   type CreatePriceInput,
 } from '../services/daily-price.service.js';
+import { logDailyPriceInsert } from '../services/audit.service.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { requireOwnerOrManager } from '../middleware/rbac.js';
 import { toTRY } from '../types/decimal.js';
@@ -80,7 +81,20 @@ router.post('/', (req: Request, res: Response): void => {
   };
 
   createPrice(input)
-    .then((row) => res.status(201).json(row))
+    .then(async (row) => {
+      if (req.user) {
+        await logDailyPriceInsert(
+          req.user.id,
+          req.user.branch_id,
+          row.id,
+          row.gold_type,
+          String(row.buy_price),
+          String(row.sell_price),
+          row.is_backdated ?? false
+        );
+      }
+      res.status(201).json(row);
+    })
     .catch((err) => res.status(400).json({ error: err.message }));
 });
 
@@ -120,7 +134,18 @@ router.post('/backdated', (req: Request, res: Response): void => {
   };
 
   createBackdatedPrice(input, req.user.id)
-    .then((row) => res.status(201).json(row))
+    .then(async (row) => {
+      await logDailyPriceInsert(
+        req.user!.id,
+        req.user!.branch_id,
+        row.id,
+        row.gold_type,
+        String(row.buy_price),
+        String(row.sell_price),
+        true
+      );
+      res.status(201).json(row);
+    })
     .catch((err) => res.status(400).json({ error: err.message }));
 });
 

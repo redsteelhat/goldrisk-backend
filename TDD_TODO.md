@@ -151,15 +151,15 @@ TDD v1.1 (wedge-scope, finansal-grade) referans alınarak sadece **backend** iç
 ## Faz 6 — Audit & Uyumluluk
 
 ### 6.1 AuditLog
-- [ ] Service layer: Transaction create, DailyPrice insert, export, MASAK report
-- [ ] GoldItem status change → DB trigger
-- [ ] Auth middleware: login/logout
-- [ ] KVKK: user_agent hash (SHA-256); müşteri PII yok, sadece customer_id
+- [x] Service layer: Transaction create, DailyPrice insert, export, MASAK report
+- [x] GoldItem status change → DB trigger
+- [x] Auth middleware: login/logout
+- [x] KVKK: user_agent hash (SHA-256); müşteri PII yok, sadece customer_id
 
 ### 6.2 MASAK
-- [ ] 20.000+ TL nakit işlem flag (masak_reported)
-- [ ] MASAK rapor endpoint
-- [ ] Index: idx_masak (masak_reported, total_amount) WHERE total_amount >= 20000
+- [x] 20.000+ TL nakit işlem flag (masak_reported)
+- [x] MASAK rapor endpoint
+- [x] Index: idx_txn_masak (masak_reported, total_amount) WHERE total_amount >= 20000
 
 ---
 
