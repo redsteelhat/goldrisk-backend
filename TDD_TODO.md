@@ -167,14 +167,14 @@ TDD v1.1 (wedge-scope, finansal-grade) referans alınarak sadece **backend** iç
 
 ### 7.1 Reconciliation
 - [x] ledger_balance = SUM(debit) - SUM(credit) per branch+product
-- [ ] Snapshot vs ledger karşılaştırma
-- [ ] Fark varsa: reconciliation_alert, manager onayı ile adjustment
+- [x] Snapshot vs ledger karşılaştırma
+- [x] Fark varsa: reconciliation_alert, manager onayı ile adjustment
 - [x] StockReconciliation batch: sayım_g vs ledger_g → inventory_gain/loss
 
 ### 7.2 Gece Job’ları
-- [ ] Günlük stock_snapshot (00:00)
-- [ ] Cross-branch reconciliation: transfer_out vs transfer_in zinciri
-- [ ] Reconciliation report + alert
+- [x] Günlük stock_snapshot (00:00)
+- [x] Cross-branch reconciliation: transfer approve→receive zinciri
+- [x] Reconciliation report + alert
 
 ---
 
