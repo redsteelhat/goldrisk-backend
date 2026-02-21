@@ -103,26 +103,26 @@ TDD v1.1 (wedge-scope, finansal-grade) referans alınarak sadece **backend** iç
 ## Faz 5 — İş Mantığı Servisleri
 
 ### 5.1 DailyPrice Servisi
-- [ ] INSERT-only fiyat kaydı
-- [ ] En güncel fiyat: ORDER BY recorded_at DESC LIMIT 1
-- [ ] Price Lock: SELECT ... FOR UPDATE SKIP LOCKED → daily_price_id
-- [ ] Backdated flow: is_backdated=true, original_price_id, impact report
+- [x] INSERT-only fiyat kaydı
+- [x] En güncel fiyat: ORDER BY recorded_at DESC LIMIT 1
+- [x] Price Lock: SELECT ... FOR UPDATE SKIP LOCKED → daily_price_id
+- [x] Backdated flow: is_backdated=true, original_price_id
 
 ### 5.2 Transaction Servisi
-- [ ] **Sale**: price lock → GoldItem FOR UPDATE → Transaction + StockLedger credit (atomik)
-- [ ] **Purchase**: Transaction + StockLedger debit (atomik)
+- [x] **Sale**: price lock → GoldItem FOR UPDATE SKIP LOCKED → Transaction + StockLedger credit (atomik)
+- [x] **Purchase**: Transaction + StockLedger debit (atomik)
 - [ ] **Return**: parent_transaction_id zorunlu, quantity_g = gerçek tartım
 - [ ] **Exchange**: bozdurma + yeni satış (veya tek transaction)
 - [ ] **Adjustment**: manager onayı, ledger debit/credit
 - [ ] **Scrap**: fire veya hurda
-- [ ] Idempotency: client_request_id kontrolü
-- [ ] MASAK: total_amount >= 20000 AND payment_method = 'cash' → flag
+- [x] Idempotency: client_request_id kontrolü
+- [x] MASAK: total_amount >= 20000 AND payment_method = 'cash' → flag
 
 ### 5.3 StockLedger Servisi
-- [ ] Transaction + Ledger aynı DB transaction
-- [ ] Debit/credit mantığı: bakiye = SUM(debit) - SUM(credit)
-- [ ] running_balance_g güncelleme (materialized cache)
-- [ ] Negatif bakiye CHECK / trigger
+- [x] Transaction + Ledger aynı DB transaction
+- [x] Debit/credit mantığı: bakiye = SUM(debit) - SUM(credit)
+- [x] running_balance_g güncelleme (materialized cache)
+- [x] Negatif bakiye CHECK / trigger (Faz 3)
 
 ### 5.4 Gram Edge-Cases
 - [ ] A1: Tartım farkı → GoldItem.actual_weight_g esas; fark > eşik → adjustment + AuditLog
