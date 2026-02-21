@@ -7,7 +7,7 @@ import pool from '../lib/db.js';
 import { lockPriceForTransaction } from './daily-price.service.js';
 import { appendLedgerEntry } from './stock-ledger.service.js';
 import { getEffectiveFireRate, calculateFireCost } from './fire-rate.service.js';
-import { logWeightDiscrepancy } from './audit.service.js';
+import { logWeightDiscrepancy, logTransactionCreate } from './audit.service.js';
 import { gramTimesPrice, toGram, toTRY, type Gram, type TRYAmount } from '../types/decimal.js';
 import { decimalToPg } from '../lib/pg-decimal.js';
 import type { GoldType } from './daily-price.service.js';
@@ -165,6 +165,11 @@ export async function createSale(
     );
 
     await client.query('COMMIT');
+    await logTransactionCreate(createdBy, input.branch_id, txnId, 'sale', {
+      gold_item_id: input.gold_item_id,
+      quantity_g: decimalToPg(quantityG),
+      total_amount: decimalToPg(totalAmountWithLabor),
+    });
     return { id: txnId };
   } catch (e) {
     await client.query('ROLLBACK');
@@ -240,6 +245,11 @@ export async function createPurchase(
     );
 
     await client.query('COMMIT');
+    await logTransactionCreate(createdBy, input.branch_id, txnId, 'purchase', {
+      product_id: input.product_id,
+      quantity_g: decimalToPg(quantityG),
+      total_amount: decimalToPg(totalAmountWithLabor),
+    });
     return { id: txnId };
   } catch (e) {
     await client.query('ROLLBACK');
@@ -362,6 +372,12 @@ export async function createReturn(
     );
 
     await client.query('COMMIT');
+    await logTransactionCreate(createdBy, input.branch_id, txnId, 'return', {
+      gold_item_id: input.gold_item_id,
+      parent_transaction_id: input.parent_transaction_id,
+      quantity_g: decimalToPg(quantityG),
+      total_amount: decimalToPg(totalAmountWithLabor),
+    });
     return { id: txnId };
   } catch (e) {
     await client.query('ROLLBACK');
@@ -434,6 +450,12 @@ export async function createAdjustment(
     );
 
     await client.query('COMMIT');
+    await logTransactionCreate(createdBy, input.branch_id, txnId, 'adjustment', {
+      product_id: input.product_id,
+      entry_type: input.entry_type,
+      quantity_g: decimalToPg(quantityG),
+      total_amount: decimalToPg(totalAmount),
+    });
     return { id: txnId };
   } catch (e) {
     await client.query('ROLLBACK');
@@ -528,6 +550,11 @@ export async function createScrap(
     );
 
     await client.query('COMMIT');
+    await logTransactionCreate(createdBy, input.branch_id, txnId, 'scrap', {
+      gold_item_id: input.gold_item_id,
+      quantity_g: decimalToPg(quantityG),
+      total_amount: decimalToPg(totalAmount),
+    });
     return { id: txnId };
   } catch (e) {
     await client.query('ROLLBACK');
