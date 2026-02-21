@@ -7,65 +7,64 @@ TDD v1.1 (wedge-scope, finansal-grade) referans alınarak sadece **backend** iç
 ## Faz 1 — Altyapı
 
 ### 1.1 Proje Kurulumu
-- [ ] Node.js + TypeScript projesi (`tsconfig.json`, `strict: true`)
-- [ ] PostgreSQL client (`pg` veya `node-postgres`)
-- [ ] `decimal.js` (veya `big.js`) bağımlılığı
-- [ ] ESLint + custom rule: `no-float-arithmetic`
-- [ ] `package.json` scripts: `dev`, `build`, `test`, `db:migrate`
+- [x] Node.js + TypeScript projesi (`tsconfig.json`, `strict: true`)
+- [x] PostgreSQL client (`pg` veya `node-postgres`)
+- [x] `decimal.js` (veya `big.js`) bağımlılığı
+- [x] ESLint + custom rule: `no-float-arithmetic`
+- [x] `package.json` scripts: `dev`, `build`, `test`, `db:migrate`
 
 ### 1.2 Decimal & Precision
-- [ ] `decimal.js` entegrasyonu (tüm para/gram hesaplamaları için)
-- [ ] TypeScript branded type: `type Gram = Decimal`, `type TRYAmount = Decimal`, `type Percent = Decimal`
-- [ ] pg-numeric ↔ Decimal dönüşüm helper'ları
+- [x] `decimal.js` entegrasyonu (tüm para/gram hesaplamaları için)
+- [x] TypeScript branded type: `type Gram = Decimal`, `type TRYAmount = Decimal`, `type Percent = Decimal`
+- [x] pg-numeric ↔ Decimal dönüşüm helper'ları
 
 ### 1.3 Lint & Risk Kontrolü
-- [ ] ESLint custom rule: float kullanımı yasak
-- [ ] Branded Decimal type zorunluluğu (CI'da kontrol)
+- [x] ESLint custom rule: float kullanımı yasak
+- [x] Branded Decimal type zorunluluğu (CI'da kontrol)
 
 ---
 
 ## Faz 2 — Veritabanı Şeması
 
 ### 2.1 Enum Tipleri
-- [ ] `gold_type` (HAS, 22A, 18A, 14A, 9A, PLATINUM, NONE)
-- [ ] `user_role` (owner, manager, cashier, auditor)
-- [ ] `transaction_type` (sale, purchase, return, exchange, transfer, adjustment, scrap)
-- [ ] `ledger_entry_type` (debit, credit)
-- [ ] `ledger_reason` (purchase, sale, transfer_in, transfer_out, adjustment, fire, scrap, return)
-- [ ] `transaction_status`, `payment_method`, `audit_action`, `product_category`, vb.
+- [x] `gold_type` (HAS, 22A, 18A, 14A, 9A, PLATINUM, NONE)
+- [x] `user_role` (owner, manager, cashier, auditor)
+- [x] `transaction_type` (sale, purchase, return, exchange, transfer, adjustment, scrap)
+- [x] `ledger_entry_type` (debit, credit)
+- [x] `ledger_reason` (purchase, sale, transfer_in, transfer_out, adjustment, fire, scrap, return)
+- [x] `transaction_status`, `payment_method`, `audit_action`, `product_category`, vb.
 
 ### 2.2 Core Tablolar
-- [ ] **Branch**: id, name, code, address, phone, is_headquarter, is_active, timestamps
-- [ ] **User**: id, branch_id, email, password_hash, full_name, role, is_active, last_login_at, timestamps
-- [ ] **DailyPrice**: id, recorded_at, gold_type, buy_price, sell_price, source, recorded_by, is_backdated, original_price_id
+- [x] **Branch**: id, name, code, address, phone, is_headquarter, is_active, timestamps
+- [x] **User**: id, branch_id, email, password_hash, full_name, role, is_active, last_login_at, timestamps
+- [x] **DailyPrice**: id, recorded_at, gold_type, buy_price, sell_price, source, recorded_by, is_backdated, original_price_id
   - CHECK: `sell_price >= buy_price`, `buy_price > 0`
-- [ ] **Product**: id, branch_id, sku, name, category, gold_type, gross_weight_g, net_weight_g, fire_rate_id, labor_cost_id, is_active, created_by, timestamps
+- [x] **Product**: id, branch_id, sku, name, category, gold_type, gross_weight_g, net_weight_g, fire_rate_id, labor_cost_id, is_active, created_by, timestamps
   - UNIQUE(branch_id, sku)
-- [ ] **GoldItem**: id, product_id, branch_id, serial_no, barcode, actual_weight_g, purity_millesimal, status, acquisition_price_g, certificate_no, notes, created_by, timestamps
+- [x] **GoldItem**: id, product_id, branch_id, serial_no, barcode, actual_weight_g, purity_millesimal, status, acquisition_price_g, certificate_no, notes, created_by, timestamps
   - UNIQUE(serial_no), CHECK(purity_millesimal BETWEEN 0 AND 1000)
-- [ ] **FireRate**: id, name, rate_percent, gold_type, scope, valid_from, valid_until, created_by
-- [ ] **LaborCost**: id, branch_id, name, amount, rate_per_gram, currency, valid_from, valid_until, created_by
+- [x] **FireRate**: id, name, rate_percent, gold_type, scope, valid_from, valid_until, created_by
+- [x] **LaborCost**: id, branch_id, name, amount, rate_per_gram, currency, valid_from, valid_until, created_by
   - CHECK: `(amount IS NOT NULL OR rate_per_gram IS NOT NULL)`
 
 ### 2.3 İşlem & Ledger Tabloları
-- [ ] **Customer** (Transaction FK için)
-- [ ] **Transaction**: id, branch_id, type, gold_item_id, customer_id, quantity_g, unit_price_g, labor_amount, total_amount, daily_price_id, payment_method, status, parent_transaction_id, masak_reported, notes, created_by, created_at
-  - CHECK: `total_amount = (quantity_g * unit_price_g) + labor_amount` → **trigger**
-  - UNIQUE(client_request_id, branch_id) → idempotency
-- [ ] **StockLedger**: id, branch_id, product_id, gold_item_id, entry_type, quantity_g, unit_price_g, transaction_id, reason, running_balance_g, created_at
+- [x] **Customer** (Transaction FK için)
+- [x] **Transaction**: id, branch_id, type, gold_item_id, customer_id, quantity_g, unit_price_g, labor_amount, total_amount, daily_price_id, payment_method, status, parent_transaction_id, masak_reported, notes, created_by, created_at
+  - UNIQUE(client_request_id, branch_id) → idempotency (trigger Faz 3’te)
+- [x] **StockLedger**: id, branch_id, product_id, gold_item_id, entry_type, quantity_g, unit_price_g, transaction_id, reason, running_balance_g, created_at
   - transaction_id NOT NULL (orphan yasak)
-- [ ] **AuditLog**: id, user_id, branch_id, entity_type, entity_id, action, old_value, new_value, ip_address, user_agent, session_id, created_at
-  - INSERT-only (RLS ile enforce)
+- [x] **AuditLog**: id, user_id, branch_id, entity_type, entity_id, action, old_value, new_value, ip_address, user_agent, session_id, created_at
+  - INSERT-only (RLS ile enforce — Faz 3)
 
 ### 2.4 Yardımcı Tablolar
-- [ ] **branch_price_override**: şube bazlı markup/markdown
-- [ ] **transfer_request**: şube arası transfer talepleri
-- [ ] **stock_snapshot**: branch_id, product_id, date, balance_g, balance_try (günlük cache)
+- [x] **branch_price_override**: şube bazlı markup/markdown
+- [x] **transfer_request**: şube arası transfer talepleri
+- [x] **stock_snapshot**: branch_id, product_id, date, balance_g, balance_try (günlük cache)
 
 ### 2.5 Index Stratejisi
-- [ ] idx_ledger_balance (branch_id, product_id, created_at DESC) INCLUDE (entry_type, quantity_g)
-- [ ] idx_price_latest (gold_type, recorded_at DESC) WHERE is_backdated = false
-- [ ] idx_txn_branch_time, idx_golditem_branch_status, vb. (TDD’deki öneriler)
+- [x] idx_ledger_balance (branch_id, product_id, created_at DESC) INCLUDE (entry_type, quantity_g)
+- [x] idx_price_latest (gold_type, recorded_at DESC) WHERE is_backdated = false
+- [x] idx_txn_branch_time, idx_golditem_branch_status, vb. (TDD’deki öneriler)
 
 ---
 
