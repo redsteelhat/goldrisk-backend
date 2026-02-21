@@ -1,0 +1,19 @@
+# GoldRisk AI - PostgreSQL
+# Kullanım: docker compose up -d
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: goldrisk-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: goldrisk
+    ports:
+      - "5432:5432"
+    volumes:
+      - goldrisk_data:/var/lib/postgresql/data
+
+volumes:
+  goldrisk_data:
